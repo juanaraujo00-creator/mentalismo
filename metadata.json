@@ -1,0 +1,6 @@
+{
+  "name": "Magic Search Peek",
+  "description": "Aplicativo de truque de mágica e mentalismo com clone do Google para captura secreta de pesquisa e tela de espionagem do mágico em tempo real.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
