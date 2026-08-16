@@ -39,6 +39,7 @@ import {
   Wand2,
   PenTool,
   BookOpen,
+  Download,
 } from "lucide-react";
 
 interface MagicianDashboardProps {
@@ -393,6 +394,17 @@ export const MagicianDashboard: React.FC<MagicianDashboardProps> = ({
             >
               <BookOpen size={15} className="text-amber-400" />
               <span>📚 Acrônimo</span>
+            </a>
+
+            {/* Direct Download ZIP Button */}
+            <a
+              href="/api/download-zip"
+              download="mentalismo-app.zip"
+              className="px-3 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 hover:text-emerald-200 text-xs font-semibold rounded-xl border border-emerald-500/30 flex items-center gap-1.5 shadow-xs transition active:scale-95"
+              title="Baixar todo o código-fonte em arquivo .ZIP para instalar no seu servidor / domínio próprio"
+            >
+              <Download size={15} className="text-emerald-400" />
+              <span>📥 Baixar ZIP</span>
             </a>
 
             {/* Switch to Spectator Google Clone */}

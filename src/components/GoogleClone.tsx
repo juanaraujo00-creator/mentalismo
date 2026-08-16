@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Search, X, Mic, Camera } from "lucide-react";
+import { GoogleImagesView } from "./GoogleImagesView";
 
 interface GoogleCloneProps {
   sessionId?: string;
@@ -15,6 +16,7 @@ export const GoogleClone: React.FC<GoogleCloneProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [secretClickCount, setSecretClickCount] = useState(0);
+  const [imagesSearchTerm, setImagesSearchTerm] = useState<"Einstein" | "Cadeira" | "Mapa Mundi" | null>(null);
   const typingTimeoutRef = useRef<any>(null);
 
   // Send live keystrokes to server
@@ -105,18 +107,27 @@ export const GoogleClone: React.FC<GoogleCloneProps> = ({
     }
   };
 
+  if (imagesSearchTerm) {
+    return (
+      <GoogleImagesView
+        term={imagesSearchTerm}
+        onReturnToSearch={() => setImagesSearchTerm(null)}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white text-[#202124] flex flex-col justify-between font-sans selection:bg-[#c2dbff] select-none">
       {/* Top Header */}
       <header className="flex items-center justify-between px-6 py-4 text-sm text-[#3c4043]">
         <div className="flex items-center gap-4 text-[13px]">
-          <span className="hover:underline cursor-pointer">Sobre</span>
+          <span onClick={() => setImagesSearchTerm("Einstein")} className="hover:underline cursor-pointer">Sobre</span>
           <span className="hover:underline cursor-pointer">Loja</span>
         </div>
 
         <div className="flex items-center gap-4 text-[13px]">
           <span className="hover:underline cursor-pointer">Gmail</span>
-          <span className="hover:underline cursor-pointer">Imagens</span>
+          <span onClick={() => setImagesSearchTerm("Einstein")} className="hover:underline cursor-pointer">Imagens</span>
 
           {/* 9 Dots Google Apps Icon */}
           <button
@@ -287,9 +298,27 @@ export const GoogleClone: React.FC<GoogleCloneProps> = ({
         {/* Footer links */}
         <div className="px-6 py-3 flex flex-wrap justify-between items-center gap-y-2 text-[13px]">
           <div className="flex flex-wrap gap-6">
-            <span className="hover:underline cursor-pointer">Sobre</span>
-            <span className="hover:underline cursor-pointer">Publicidade</span>
-            <span className="hover:underline cursor-pointer">Negócios</span>
+            <span
+              onClick={() => setImagesSearchTerm("Einstein")}
+              className="hover:underline cursor-pointer"
+              title="Sobre"
+            >
+              Sobre
+            </span>
+            <span
+              onClick={() => setImagesSearchTerm("Cadeira")}
+              className="hover:underline cursor-pointer"
+              title="Publicidade"
+            >
+              Publicidade
+            </span>
+            <span
+              onClick={() => setImagesSearchTerm("Mapa Mundi")}
+              className="hover:underline cursor-pointer"
+              title="Negócios"
+            >
+              Negócios
+            </span>
             <span className="hover:underline cursor-pointer">Como funciona a Pesquisa</span>
           </div>
           <div className="flex flex-wrap gap-6">

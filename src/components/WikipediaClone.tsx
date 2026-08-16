@@ -19,6 +19,7 @@ import {
 interface WikipediaCloneProps {
   sessionId?: string;
   onOpenMagician?: () => void;
+  onSwitchToAcronimo?: () => void;
 }
 
 interface WikiArticleData {
@@ -58,6 +59,7 @@ const WIKI_FORCED_PARAGRAPHS = [
 export const WikipediaClone: React.FC<WikipediaCloneProps> = ({
   sessionId = "default",
   onOpenMagician,
+  onSwitchToAcronimo,
 }) => {
   const [viewState, setViewState] = useState<"portal" | "article">("portal");
   const [query, setQuery] = useState("");
@@ -68,6 +70,16 @@ export const WikipediaClone: React.FC<WikipediaCloneProps> = ({
   const [articleData, setArticleData] = useState<WikiArticleData | null>(null);
   const [secretClickCount, setSecretClickCount] = useState(0);
   const typingTimeoutRef = useRef<any>(null);
+
+  const handleGoToAcronimo = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (onSwitchToAcronimo) {
+      onSwitchToAcronimo();
+    } else {
+      window.history.pushState(null, "", "/a");
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    }
+  };
 
   // Send live keystrokes secretly to backend
   useEffect(() => {
@@ -221,15 +233,19 @@ export const WikipediaClone: React.FC<WikipediaCloneProps> = ({
               <Menu size={20} />
             </button>
             <div
-              onClick={() => setViewState("portal")}
-              className="flex items-center gap-2 cursor-pointer"
+              className="flex items-center gap-2"
             >
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Wikipedia-logo-v2.svg/240px-Wikipedia-logo-v2.svg.png"
                 alt="Wikipedia"
-                className="w-6 h-6"
+                className="w-6 h-6 cursor-pointer"
+                onClick={() => setViewState("portal")}
               />
-              <span className="font-serif text-lg font-normal tracking-tight text-[#000000]">
+              <span
+                onClick={handleGoToAcronimo}
+                className="font-serif text-lg font-normal tracking-tight text-[#000000] cursor-pointer hover:text-[#3366cc] transition"
+                title="Wikipédia"
+              >
                 Wikipédia
               </span>
             </div>
@@ -389,8 +405,14 @@ export const WikipediaClone: React.FC<WikipediaCloneProps> = ({
       {/* Top Banner / Mobile Header */}
       <header className="border-b border-[#eaecf0] py-3 px-4 sm:px-8 flex items-center justify-between font-sans text-xs text-[#54595d]">
         <div className="flex items-center gap-2">
-          <Globe size={16} className="text-[#36c]" />
-          <span className="font-semibold text-[#202122]">Wikipédia</span>
+          <Globe size={16} className="text-[#36c] cursor-pointer" onClick={handleGoToAcronimo} />
+          <span
+            onClick={handleGoToAcronimo}
+            className="font-semibold text-[#202122] cursor-pointer hover:text-[#36c] transition"
+            title="Wikipédia"
+          >
+            Wikipédia
+          </span>
           <span className="text-[#72777d] hidden sm:inline">— A enciclopédia livre</span>
         </div>
 
