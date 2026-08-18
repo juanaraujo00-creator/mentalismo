@@ -339,11 +339,28 @@ export const AcronimoMode: React.FC<AcronimoModeProps> = ({
     }
   };
 
+  // Clean HTML tags helper
+  const cleanHtmlTags = (text: string) => {
+    if (!text) return "";
+    return text.replace(/<[^>]+>/g, "").trim();
+  };
+
   // Build Paragraphs with Natural Hyperlinks (All with 3rd letter === targetChar)
   const renderInteractiveContent = () => {
-    const rawExtract =
+    const rawExtract = cleanHtmlTags(
       articleData?.extract ||
-      `${currentArticleTitle} compreende uma vasta área de pesquisa e desenvolvimento cultural, histórico e científico.`;
+      `${currentArticleTitle} compreende uma vasta área de pesquisa e desenvolvimento cultural, histórico e científico.`
+    );
+
+    // Format first paragraph cleanly without duplicate prefixes
+    let formattedLead = rawExtract;
+    const cleanTitle = cleanHtmlTags(currentArticleTitle);
+    if (formattedLead.toLowerCase().startsWith(cleanTitle.toLowerCase())) {
+      formattedLead = formattedLead.slice(cleanTitle.length).trim();
+      if (formattedLead.startsWith(",") || formattedLead.startsWith(":")) {
+        formattedLead = formattedLead.slice(1).trim();
+      }
+    }
 
     // Pool of available 3rd-letter matching words
     const availablePool = ACRONYM_DICTIONARY[targetChar] || [
@@ -355,10 +372,10 @@ export const AcronimoMode: React.FC<AcronimoModeProps> = ({
 
     return (
       <div className="space-y-4 text-slate-800 text-[15px] sm:text-base leading-relaxed font-serif">
-        {/* Paragraph 1: Real Wikipedia extract enriched with 3rd-letter links */}
+        {/* Paragraph 1: Real Wikipedia extract */}
         <p className="leading-relaxed">
-          <span className="font-bold text-slate-900">{currentArticleTitle}</span>{" "}
-          {rawExtract.replace(currentArticleTitle, "")}
+          <strong className="font-bold text-slate-900">{cleanTitle}</strong>
+          {formattedLead ? ` ${formattedLead}` : " é amplamente documentado no acervo enciclopédico."}
         </p>
 
         {/* Paragraph 2: Encyclopedic context naturally weaving in the target links */}
@@ -624,7 +641,7 @@ export const AcronimoMode: React.FC<AcronimoModeProps> = ({
           <div className="border-b border-[#a2a9b1] pb-2 mb-4 flex flex-wrap items-end justify-between gap-2">
             <div>
               <h1 className="text-2xl sm:text-3xl font-serif text-black font-normal">
-                {articleData?.displaytitle || currentArticleTitle}
+                {cleanHtmlTags(articleData?.displaytitle || articleData?.title || currentArticleTitle)}
               </h1>
               <p className="text-xs text-[#54595d] mt-0.5">
                 Origem: Wikipédia, a enciclopédia livre.
