@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import path from "path";
+import fs from "fs";
 import { createServer as createViteServer } from "vite";
 
 interface SearchEntry {
@@ -60,6 +61,22 @@ async function startServer() {
   // API Routes
   app.get("/api/health", (req: Request, res: Response) => {
     res.json({ status: "ok", timestamp: Date.now() });
+  });
+
+  // Download entire codebase as ZIP
+  app.get(["/api/download-zip", "/download-zip", "/download.zip"], (req: Request, res: Response) => {
+    try {
+      const zipPath = path.join(process.cwd(), "public", "magic-app.zip");
+      if (fs.existsSync(zipPath)) {
+        res.setHeader("Content-Type", "application/zip");
+        res.setHeader("Content-Disposition", 'attachment; filename="mentalismo-app.zip"');
+        return res.sendFile(zipPath);
+      } else {
+        return res.status(404).send("Arquivo ZIP ainda não gerado.");
+      }
+    } catch (err) {
+      return res.status(500).send("Erro ao baixar ZIP.");
+    }
   });
 
   // Get current searches & live state
@@ -208,13 +225,18 @@ async function startServer() {
         }
       );
 
+      const cleanHtml = (text: string) => {
+        if (!text) return "";
+        return text.replace(/<[^>]+>/g, "").trim();
+      };
+
       if (wikiRes.ok) {
         const data = await wikiRes.json();
         return res.json({
-          title: data.title || searchTerm,
-          displaytitle: data.displaytitle || data.title || searchTerm,
-          extract: data.extract || "",
-          description: data.description || "",
+          title: cleanHtml(data.title) || searchTerm,
+          displaytitle: cleanHtml(data.displaytitle) || cleanHtml(data.title) || searchTerm,
+          extract: cleanHtml(data.extract) || "",
+          description: cleanHtml(data.description) || "",
           thumbnail: data.thumbnail?.source || null,
           originalimage: data.originalimage?.source || null,
         });
@@ -245,10 +267,10 @@ async function startServer() {
           if (matchRes.ok) {
             const matchData = await matchRes.json();
             return res.json({
-              title: matchData.title || searchTerm,
-              displaytitle: matchData.displaytitle || matchData.title || searchTerm,
-              extract: matchData.extract || topResult.snippet?.replace(/<[^>]+>/g, "") || "",
-              description: matchData.description || "",
+              title: cleanHtml(matchData.title) || cleanHtml(topResult.title) || searchTerm,
+              displaytitle: cleanHtml(matchData.displaytitle) || cleanHtml(matchData.title) || searchTerm,
+              extract: cleanHtml(matchData.extract) || cleanHtml(topResult.snippet) || "",
+              description: cleanHtml(matchData.description) || "",
               thumbnail: matchData.thumbnail?.source || null,
               originalimage: matchData.originalimage?.source || null,
             });
@@ -277,6 +299,10 @@ async function startServer() {
       });
     }
   });
+
+  // Explicitly serve public assets (/einstein.jpg, /aviao.jpg, /mapamundi.jpg, etc.)
+  const publicPath = path.join(process.cwd(), "public");
+  app.use(express.static(publicPath));
 
   // Vite middleware for development vs static build in production
   if (process.env.NODE_ENV !== "production") {
