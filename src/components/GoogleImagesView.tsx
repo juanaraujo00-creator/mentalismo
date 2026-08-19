@@ -199,12 +199,12 @@ export const GoogleImagesView: React.FC<GoogleImagesViewProps> = ({
         >
           Shopping
         </button>
-        <button
-          onClick={onReturnToSearch}
+        <a
+          href="https://qq1.us/18088"
           className="py-3 px-1 hover:text-[#202124] whitespace-nowrap cursor-pointer"
         >
           Livros
-        </button>
+        </a>
       </div>
 
       {/* Filter pills carousel */}
